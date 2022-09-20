@@ -48,3 +48,6 @@ XENDIT_KEY_API=
 
 ## Laravel-paypal documentation by srmklive
 - https://srmklive.github.io/laravel-paypal/docs.html
+
+## Xendit Documentation REST API
+- https://developers.xendit.co/api-reference/
