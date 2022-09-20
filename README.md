@@ -12,6 +12,12 @@
 Composer Install
 ```
 
+## Instalation
+```bash
+cp .env.example .env
+```
+
+
 ## Paypal Package
 
 - https://github.com/srmklive/laravel-paypal
