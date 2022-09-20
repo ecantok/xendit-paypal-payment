@@ -7,16 +7,35 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Instalation
+## Install Composer to add package
 ```bash
 Composer Install
 ```
 
-## Instalation
+## Add .env
 ```bash
 cp .env.example .env
 ```
 
+## Configuration paypal in .env
+```bash
+#PayPal API Mode
+# Values: sandbox or live (Default: live)
+PAYPAL_MODE=
+
+#PayPal Setting & API Credentials - sandbox
+PAYPAL_SANDBOX_CLIENT_ID=
+PAYPAL_SANDBOX_CLIENT_SECRET=
+
+#PayPal Setting & API Credentials - live
+PAYPAL_LIVE_CLIENT_ID=
+PAYPAL_LIVE_CLIENT_SECRET=
+```
+
+## Configuration Xendit APIKey in .env (Optional)
+```bash
+XENDIT_KEY_API=
+```
 
 ## Paypal Package
 
