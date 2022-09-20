@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Install Composer to add package
+## Install Composer
 ```bash
 Composer Install
 ```
@@ -45,3 +45,6 @@ XENDIT_KEY_API=
 ## Xendit References
 
 - https://github.com/xendit/checkout-demo-laravel
+
+## LaravelPaypal documentation by srmklive
+- https://srmklive.github.io/laravel-paypal/docs.html
