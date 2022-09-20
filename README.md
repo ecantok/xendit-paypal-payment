@@ -42,6 +42,9 @@ XENDIT_KEY_API=
 - https://github.com/srmklive/laravel-paypal
 - https://github.com/thephpleague/omnipay
 
+## Xendit Package
+- https://github.com/xendit/xendit-php
+
 ## Xendit References
 
 - https://github.com/xendit/checkout-demo-laravel
