@@ -46,5 +46,5 @@ XENDIT_KEY_API=
 
 - https://github.com/xendit/checkout-demo-laravel
 
-## LaravelPaypal documentation by srmklive
+## Laravel-paypal documentation by srmklive
 - https://srmklive.github.io/laravel-paypal/docs.html
