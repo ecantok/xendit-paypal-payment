@@ -9,9 +9,9 @@
 
 ## Paypal Package
 
-https://github.com/srmklive/laravel-paypal
-https://github.com/thephpleague/omnipay
+- https://github.com/srmklive/laravel-paypal
+- https://github.com/thephpleague/omnipay
 
 ## Xendit References
 
-https://github.com/xendit/checkout-demo-laravel
+- https://github.com/xendit/checkout-demo-laravel
