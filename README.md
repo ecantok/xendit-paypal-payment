@@ -9,7 +9,7 @@
 
 ## Install Composer
 ```bash
-Composer Install
+Composer Install && Composer Update
 ```
 
 ## Add .env
