@@ -13,7 +13,7 @@ class XenditController extends Controller
 {
     public function __construct()
     {
-        Xendit::setApiKey(env('API_KEY'));
+        Xendit::setApiKey(env('XENDIT_API_KEY'));
     }
 
     public function getListPaymentChannel()
