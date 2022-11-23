@@ -5,6 +5,19 @@
         integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    @if (session()->get('localization_currency') == 'VEX')
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .loading {
+                width: 200px;
+            }
+        </style>
+        <script src="{{ url('js/vex.min.js') }}" type="text/javascript"></script>
+        <script src="{{ url('js/scatterjs-core.min.js') }}" type="text/javascript"></script>
+        <script src="{{ url('js/scatterjs-plugin-vexjs.min.js') }}" type="text/javascript"></script>
+    @endif
 @endpush
 
 @section('content')
@@ -60,42 +73,51 @@
                             Select Currency
                         </button>
                         <ul class="dropdown-menu dropdown-menu-dark" id="dropdown-localization">
-                            <li><a class="dropdown-item" href="{{ route('change-currency', 'ID') }}">Indonesian - Rupiah</a></li>
                             <li><a class="dropdown-item" href="{{ route('change-currency', 'USD') }}">US - Dollar</a></li>
+                            <li><a class="dropdown-item" href="{{ route('change-currency', 'VEX') }}">VEX</a></li>
+                            <li><a class="dropdown-item" href="{{ route('change-currency', 'IDR') }}">Indonesian -
+                                    Rupiah</a></li>
                         </ul>
                     </div>
                     <div class="small mb-1">SKU: BST-498</div>
                     <h1 class="display-5 fw-bolder">Human Race Dream Project 2022 #001 </h1>
                     <div class="fs-5 mb-3">
-                        <span>@if(session()->get("localization_currency") == "USD") $ {{ $data['price'] }} @else Rp. {{ $data['price'] }}  @endif</span>
+                        <span>
+                            @if (session()->get('localization_currency') == 'USD')
+                                $ {{ $data['price'] }}
+                            @else
+                                Rp. {{ $data['price'] }}
+                            @endif
+                        </span>
                     </div>
                     <p class="lead mb-5">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium at dolorem
                         quidem
                         modi. Nam sequi consequatur obcaecati excepturi alias magni, accusamus eius blanditiis delectus
-                        ipsam minima ea iste laborum vero?</p>
+                        ipsam minima ea iste laborum vero? </p>
                     <div class="d-block">
-                        @if(session()->get('localization_currency') == 'USD')
-                            {{-- <form action="{{ route('paypal-checkout') }}" method="post">
+                        @switch(session()->get('localization_currency'))
+                            @case('USD')
+                                <div id="paypal-button-container" data-amount="{{ $data['price'] }}"></div>
+                            @break
 
-                                @csrf
-
-                                <input type="hidden" name="amount" value="{{ $data['price'] }}">
-
-                                <button type="submit" class="btn btn-outline-dark flex-shrink-0" id="btn-buy">
+                            @case('VEX')
+                                <button class="btn btn-dark flex-shrink-0" type="button" id="btn-buy" data-bs-toggle="modal"
+                                    data-bs-target="#modal-vex-form">
                                     <i class="bi-cart-fill me-1"></i>
-                                    Buy With Paypal
+                                    Buy With VEX
                                 </button>
-                            </form> --}}
+                            @break
 
-                            <div id="paypal-button-container" data-amount="{{ $data['price'] }}"></div>
+                            {{-- IDR --}}
 
-                        @else
-                        <button class="btn btn-outline-dark flex-shrink-0" type="button" id="btn-buy"
-                        data-bs-toggle="modal" data-bs-target="#modal-shipping-form">
-                            <i class="bi-cart-fill me-1"></i>
-                            Buy With Xendit
-                        </button>
-                        @endif
+                            @default
+                                <button class="btn btn-danger flex-shrink-0" type="button" id="btn-buy" data-bs-toggle="modal"
+                                    data-bs-target="#modal-shipping-form">
+                                    <i class="bi-cart-fill me-1"></i>
+                                    Buy With Xendit
+                                </button>
+                        @endswitch
+
                     </div>
                 </div>
             </div>
@@ -134,7 +156,8 @@
                             <div class="row align-items-end mb-3">
                                 <div class="col-lg-6 form-group has-validation">
                                     <label for="firstname" class="form-label">Name</label>
-                                    <input type="text" name="firstname" placeholder="First Name" class="form-control">
+                                    <input type="text" name="firstname" placeholder="First Name"
+                                        class="form-control">
                                 </div>
                                 <div class="col-lg-6 form-group">
                                     <input type="text" name="lastname" placeholder="Last Name" class="form-control">
@@ -191,15 +214,123 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-vex-form" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="data-content p-2">
+                        <h5 class="modal-title">Data Customers</h5>
+                        <p class="mb-0">Insert your Vex account here</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <button class="btn btn-primary loading" id="buttonConnect" title="">
+                        <i class="fa fa-spinner fa-spin"></i>
+                    </button>
+                    <div id="formConfirmPayment" style="display:none">
+                        Hello <span id="accountName"></span>
+                        <div id="btnLogout" class="btn btn-danger">Logout</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
     </script>
-    <script src="https://www.paypal.com/sdk/js?client-id={{ env('PAYPAL_SANDBOX_CLIENT_ID') }}&currency=USD&disable-funding=credit,card"></script>
+    <script
+        src="https://www.paypal.com/sdk/js?client-id={{ env('PAYPAL_SANDBOX_CLIENT_ID') }}&currency=USD&disable-funding=credit,card">
+    </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ url('js/main.js') }}"></script>
-    @if(session()->get('localization_currency') == 'USD')
-    <script src="{{ url('js/paypal.js') }}"></script>
+    <script>
+        $(function() {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+    </script>
+    @if (session()->get('localization_currency') == 'USD')
+        <script src="{{ url('js/paypal.js') }}"></script>
+    @endif
+    @if (session()->get('localization_currency') == 'VEX')
+        <script>
+            ScatterJS.plugins(Vexanium());
+            var network = ScatterJS.Network.fromJson({
+                blockchain: bc('vex'),
+                chainId: 'f9f432b1851b5c179d2091a96f593aaed50ec7466b74f89301f957a83e56ce1f',
+                host: '209.97.162.124',
+                port: 8080,
+                protocol: 'http'
+            });
+
+            let account = "";
+            let balance = "0.0000 VEX";
+
+            const btn = $("#btn-buy");
+            const btnConnect = $('#buttonConnect');
+            const formConfirmPayment = $('#formConfirmPayment');
+            const textBtnConnect = "Connect your Wallet";
+            const btnLogout = document.getElementById("btnLogout");
+            btnLogout.addEventListener("click", function (evt) {
+                logout();
+            });
+
+            btn.click(function() {
+                ScatterJS.connect('Basic DApp (Simple)', {
+                    network
+                }).then(connected => {
+                    if (!connected) {
+                        btnConnect.prop("disabled", true)
+                        btnConnect.text("Cannot connect to your Wallet");
+                        return;
+                    }
+                    login();
+                    btnConnect.prop("disabled", false)
+                    btnConnect.text(textBtnConnect);
+                });
+
+            });
+
+            btnConnect.click(function () {
+                login();
+            });
+
+            function login() {
+                try {
+                    ScatterJS.login().then(id => {
+                        if (!id) return;
+                        account = id.accounts[0].name;
+                        formConfirmPayment.css("display", "block");
+                        btnConnect.css("display", "none");
+                        console.log(account);
+                        $('#accountName').text(account);
+                        // document.addEventListener.;
+                        // onConnected();
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+
+            function logout() {
+                try {
+                    // if (!fromDappBrowser) 
+                    ScatterJS.logout();
+                    btnConnect.css("display", "block");
+                    formConfirmPayment.css("display", "none");
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        </script>
     @endif
 @endsection
