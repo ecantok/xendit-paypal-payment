@@ -85,8 +85,10 @@
                         <span>
                             @if (session()->get('localization_currency') == 'USD')
                                 $ {{ $data['price'] }}
+                            @elseif (session()->get('localization_currency') == 'VEX')
+                                1.001 VEX
                             @else
-                                Rp. {{ $data['price'] }}
+                                Rp {{ $data['price'] }}
                             @endif
                         </span>
                     </div>
