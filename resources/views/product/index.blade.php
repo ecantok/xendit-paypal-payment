@@ -11,7 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             .loading {
-                width: 200px;
+                min-width: 200px;
             }
         </style>
         <script src="{{ url('js/vex.min.js') }}" type="text/javascript"></script>
