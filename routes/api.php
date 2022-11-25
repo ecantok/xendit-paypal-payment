@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaypalGatewayController;
 use App\Http\Controllers\Api\Payment\PaypalController;
+use App\Http\Controllers\Api\Payment\VexController;
 use App\Http\Controllers\Api\Payment\XenditController;
 
 /*
@@ -34,4 +35,8 @@ Route::prefix("paypal-gateway")->group(function () {
     Route::post("/checkout", [PaypalGatewayController::class, "createOrder"])->name('paypal-gateway-checkout');
     Route::post("/capture", [PaypalGatewayController::class, "captureOrder"])->name("paypal-gateway-capture");
     Route::get("/OrderDetails", [PaypalGatewayController::class, "getOrderData"]);
+});
+
+Route::prefix("v1")->group(function () {
+    Route::post("/vex/purchase", [VexController::class, "purchase"]);
 });

@@ -16,9 +16,12 @@ class productController extends Controller
 
         $priceIDR = 100000;
         $priceUSD = MoneyCurrency::IDRToUSD($priceIDR);
+        $priceVEX = "0.0001 VEX";
 
         $data = [
-            "price" => (session()->get("localization_currency") == "USD") ? $priceUSD : number_format($priceIDR),
+            "price" => (session()->get("localization_currency") == "USD") ? $priceUSD : 
+                        ((session()->get("localization_currency") == "VEX") ? $priceVEX : number_format($priceIDR))
+                ,
         ];
 
         if (session()->get('localization_currency') == "ID") {
@@ -36,7 +39,7 @@ class productController extends Controller
             }
         }
 
-        return view('product/index', compact('data'));
+        return view('product.index', compact('data'));
     }
 
     public function changeRegion($region)

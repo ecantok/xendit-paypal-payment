@@ -82,12 +82,13 @@
                     <div class="small mb-1">SKU: BST-498</div>
                     <h1 class="display-5 fw-bolder">Human Race Dream Project 2022 #001 </h1>
                     <div class="fs-5 mb-3">
-                        <span>
+                        <span id="priceAmount">
                             @if (session()->get('localization_currency') == 'USD')
                                 $ {{ $data['price'] }}
                             @elseif (session()->get('localization_currency') == 'VEX')
-                                1.001 VEX
+                                {{ $data['price'] }}
                             @else
+                                {{-- IDR --}}
                                 Rp {{ $data['price'] }}
                             @endif
                         </span>
@@ -229,12 +230,22 @@
                 </div>
 
                 <div class="modal-body">
-                    <button class="btn btn-primary loading" id="buttonConnect" title="">
-                        <i class="fa fa-spinner fa-spin"></i>
-                    </button>
-                    <div id="formConfirmPayment" style="display:none">
-                        Hello <span id="accountName"></span>
-                        <div id="btnLogout" class="btn btn-danger">Logout</div>
+                    <div class="container row">
+                        <button class="btn btn-primary loading" id="buttonConnect" title="">
+                            <i class="fa fa-spinner fa-spin"></i>
+                        </button>
+                        <div id="formConfirmPayment" class="row" style="display:none">
+                            <button id="btnLogout" class="col-3 btn btn-danger">Logout</button>
+                            <div class="row">
+                                <div>
+                                    Hello <span id="accountName"></span>
+                                </div>
+                                <div>
+                                    Balance <span id="balanceAmount"></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" id="confirmBuy">Confirm Payment</button>
+                        </div>
                     </div>
                 </div>
 
@@ -273,6 +284,8 @@
                 port: 8080,
                 protocol: 'http'
             });
+            const price = Number(document.getElementById("priceAmount").textContent.replace(/[^0-9.-]+/g, ""));
+            console.log(price);
 
             let account = "";
             let balance = "0.0000 VEX";
@@ -282,7 +295,7 @@
             const formConfirmPayment = $('#formConfirmPayment');
             const textBtnConnect = "Connect your Wallet";
             const btnLogout = document.getElementById("btnLogout");
-            btnLogout.addEventListener("click", function (evt) {
+            btnLogout.addEventListener("click", function(evt) {
                 logout();
             });
 
@@ -302,7 +315,7 @@
 
             });
 
-            btnConnect.click(function () {
+            btnConnect.click(function() {
                 login();
             });
 
@@ -310,13 +323,30 @@
                 try {
                     ScatterJS.login().then(id => {
                         if (!id) return;
+                        console.log(id);
                         account = id.accounts[0].name;
                         formConfirmPayment.css("display", "block");
                         btnConnect.css("display", "none");
-                        console.log(account);
                         $('#accountName').text(account);
-                        // document.addEventListener.;
-                        // onConnected();
+
+                        try {
+                            const vexnet = VexNet(network);
+                            vexnet.getAccount(account).then(info => {
+                                balance = info.core_liquid_balance ? info.core_liquid_balance : balance;
+                                setTimeout(function() {
+                                    console.log(info);
+                                    $('#balanceAmount').text(balance);
+                                    const balanceNumber = Number(balance.replace(/[^0-9.-]+/g, ""))
+                                    if (price < balanceNumber) {
+                                        console.log("You can buy this");
+                                    } else {
+                                        console.log("You cannot buy this");
+                                    }
+                                }, 500);
+                            });
+                        } catch (e) {
+                            console.log(e);
+                        }
                     });
                 } catch (e) {
                     console.log(e);
@@ -332,6 +362,42 @@
                 } catch (e) {
                     console.log(e);
                 }
+            }
+
+            const confirmBuy = $("confirmBuy").click(function() {
+                buyVoucher();
+            });
+
+            function buyVoucher() {
+
+                return fetch(`api/v1/vex/purchase`, {
+                        method: "POST",
+                        body: JSON.stringify({
+                            orderId: data.orderID,
+                        }),
+                    })
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((callbackData) => {
+                        if (callbackData.status == "COMPLETED") {
+                            setTimeout(function() {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: `Payment Success`,
+                                    text: `Transaction Complete Your ID is ${callbackData.id}`,
+                                    showConfirmButton: true,
+                                });
+                            }, 1000);
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: `Transaction Failed`,
+                                text: `Your transaction cannot be processed`,
+                                showConfirmButton: true,
+                            });
+                        }
+                    });
             }
         </script>
     @endif
