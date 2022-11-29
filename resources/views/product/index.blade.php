@@ -271,9 +271,6 @@
             $('[data-toggle="tooltip"]').tooltip()
         });
     </script>
-    @if (session()->get('localization_currency') == 'USD')
-        <script src="{{ url('js/paypal.js') }}"></script>
-    @endif
     @if (session()->get('localization_currency') == 'VEX')
         <script>
             ScatterJS.plugins(Vexanium());
@@ -284,8 +281,8 @@
                 port: 8080,
                 protocol: 'http'
             });
-            const price = Number(document.getElementById("priceAmount").textContent.replace(/[^0-9.-]+/g, ""));
-            console.log(price);
+            const priceAmount = Number(document.getElementById("priceAmount").textContent.replace(/[^0-9.-]+/g, ""));
+            console.log(priceAmount);
 
             let account = "";
             let balance = "0.0000 VEX";
@@ -337,7 +334,7 @@
                                     console.log(info);
                                     $('#balanceAmount').text(balance);
                                     const balanceNumber = Number(balance.replace(/[^0-9.-]+/g, ""))
-                                    if (price < balanceNumber) {
+                                    if (priceAmount < balanceNumber) {
                                         console.log("You can buy this");
                                     } else {
                                         console.log("You cannot buy this");
@@ -364,41 +361,17 @@
                 }
             }
 
-            const confirmBuy = $("confirmBuy").click(function() {
+            let confirmBuy = document.getElementById("confirmBuy");
+            confirmBuy.onclick = function() {
                 buyVoucher();
-            });
+            };
 
             function buyVoucher() {
-
-                return fetch(`api/v1/vex/purchase`, {
-                        method: "POST",
-                        body: JSON.stringify({
-                            orderId: data.orderID,
-                        }),
-                    })
-                    .then((response) => {
-                        return response.json();
-                    })
-                    .then((callbackData) => {
-                        if (callbackData.status == "COMPLETED") {
-                            setTimeout(function() {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: `Payment Success`,
-                                    text: `Transaction Complete Your ID is ${callbackData.id}`,
-                                    showConfirmButton: true,
-                                });
-                            }, 1000);
-                        } else {
-                            Swal.fire({
-                                icon: "error",
-                                title: `Transaction Failed`,
-                                text: `Your transaction cannot be processed`,
-                                showConfirmButton: true,
-                            });
-                        }
-                    });
+                console.log("Check");
             }
         </script>
     @endif
+    @if (session()->get('localization_currency') == 'USD')
+    <script src="{{ url('js/paypal.js') }}"></script>
+@endif
 @endsection
