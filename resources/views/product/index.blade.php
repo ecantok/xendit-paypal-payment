@@ -244,7 +244,7 @@
                                     Balance <span id="balanceAmount"></span>
                                 </div>
                             </div>
-                            <button class="btn btn-primary" id="confirmBuy">Confirm Payment</button>
+                            <button class="btn btn-primary" id="confirmBuy" disabled>Confirm Payment</button>
                         </div>
                     </div>
                 </div>
@@ -273,14 +273,16 @@
     </script>
     @if (session()->get('localization_currency') == 'VEX')
         <script>
+            const fromDappBrowser = navigator.userAgent=='VexWalletAndroid';
             ScatterJS.plugins(Vexanium());
-            var network = ScatterJS.Network.fromJson({
+            const network = Object.freeze(ScatterJS.Network.fromJson({
                 blockchain: bc('vex'),
                 chainId: 'f9f432b1851b5c179d2091a96f593aaed50ec7466b74f89301f957a83e56ce1f',
                 host: '209.97.162.124',
                 port: 8080,
                 protocol: 'http'
-            });
+            }));
+            const appname = "Vex Payment";
             const priceAmount = Number(document.getElementById("priceAmount").textContent.replace(/[^0-9.-]+/g, ""));
             console.log(priceAmount);
 
@@ -297,19 +299,33 @@
             });
 
             btn.click(function() {
-                ScatterJS.connect('Basic DApp (Simple)', {
-                    network
-                }).then(connected => {
-                    if (!connected) {
-                        btnConnect.prop("disabled", true)
-                        btnConnect.text("Cannot connect to your Wallet");
-                        return;
+                try{
+                    if(!fromDappBrowser){
+                        ScatterJS.connect(appname,{network}).then(connected => {
+                            if (!connected) {
+                                btnConnect.prop("disabled", true)
+                                btnConnect.text("Cannot connect to your Wallet");
+                                return;
+                            }
+                            login();
+                            btnConnect.prop("disabled", false)
+                            btnConnect.text(textBtnConnect);
+                        });
+                    } else {
+                        pe.getWalletWithAccount().then((res)=>{
+                            if(!res) {
+                                btnConnect.prop("disabled", true)
+                                btnConnect.text("Cannot connect to your Wallet");
+                                return;
+                            }
+                            account = res.data.account;
+                            btnConnect.prop("disabled", false)
+                            btnConnect.text(textBtnConnect);
+                        });  
                     }
-                    login();
-                    btnConnect.prop("disabled", false)
-                    btnConnect.text(textBtnConnect);
-                });
-
+                } catch (e) {
+                    console.log(e);
+                }
             });
 
             btnConnect.click(function() {
@@ -336,8 +352,10 @@
                                     const balanceNumber = Number(balance.replace(/[^0-9.-]+/g, ""))
                                     if (priceAmount < balanceNumber) {
                                         console.log("You can buy this");
+                                        confirmBuy.removeAttribute("disabled");
                                     } else {
                                         console.log("You cannot buy this");
+                                        confirmBuy.setAttribute("disabled", "");
                                     }
                                 }, 500);
                             });
@@ -367,7 +385,43 @@
             };
 
             function buyVoucher() {
-                console.log("Check");
+                window.ScatterJS.scatter.connect(appname).then(connected => {
+                    if (!connected) return false;
+
+                    window.ScatterJS.plugins(new window.ScatterEOS());
+                    var scatter = window.ScatterJS.scatter;
+                    const requiredFields = { accounts: [network] };
+                    scatter.getIdentity(requiredFields).then(() => {
+                        account = scatter.identity.accounts.find(account => account.blockchain === 'eos');
+                        if (!account) return;
+                
+                        var accountName = account.name;
+                        var sign = `${account.name}@${account.authority}`;
+
+                        var contract_reg = "vex.token";
+                        var vexnet = VexNet(network);
+                        vexnet.contract(contract_reg).then(contract =>
+                            contract.transfer({
+                                
+                                from: accountName,
+                                to: 'anubinanu321',
+                                quantity: '0.0001 VEX',
+                                memo: "Transaction testing"
+                            
+                            }, {
+                                authorization: sign
+                            })).then(function () {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: `Payment Success`,
+                                    text: `Transaction Complete!`,
+                                    showConfirmButton: true,
+                                });
+                            }).catch(function (exception) {
+                                alert(exception)
+                            })
+                    })
+                });
             }
         </script>
     @endif
