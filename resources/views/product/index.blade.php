@@ -410,7 +410,17 @@
                             
                             }, {
                                 authorization: sign
-                            })).then(function () {
+                            })).then(function (response) {
+                                console.log(response);
+                                if (response) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: `Payment Success`,
+                                        text: `Transaction Complete! Your transaction id is ${response.transaction_id} `,
+                                        showConfirmButton: true,
+                                    });
+                                    return;
+                                }
                                 Swal.fire({
                                     icon: "success",
                                     title: `Payment Success`,
@@ -418,8 +428,8 @@
                                     showConfirmButton: true,
                                 });
                             }).catch(function (exception) {
-                                alert(exception)
-                            })
+                                alert(exception);
+                            });
                     })
                 });
             }
