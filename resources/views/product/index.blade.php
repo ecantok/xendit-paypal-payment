@@ -386,7 +386,15 @@
 
             function buyVoucher() {
                 window.ScatterJS.scatter.connect(appname).then(connected => {
-                    if (!connected) return false;
+                    if (!connected) {
+                        Swal.fire({
+                            icon: "error",
+                            title: `Transaction Canceled`,
+                            text: `Please refresh the page and make sure your wallet is connected`,
+                            showConfirmButton: true,
+                        });
+                        return false;
+                    }
 
                     window.ScatterJS.plugins(new window.ScatterEOS());
                     var scatter = window.ScatterJS.scatter;
@@ -404,33 +412,35 @@
                             contract.transfer({
                                 
                                 from: accountName,
-                                to: 'anubinanu321',
+                                to: 'davidcollect',
                                 quantity: '0.0001 VEX',
                                 memo: "Transaction testing"
                             
                             }, {
                                 authorization: sign
-                            })).then(function (response) {
-                                console.log(response);
-                                if (response) {
-                                    Swal.fire({
-                                        icon: "success",
-                                        title: `Payment Success`,
-                                        text: `Transaction Complete! Your transaction id is ${response.transaction_id} `,
-                                        showConfirmButton: true,
-                                    });
-                                    return;
-                                }
+                            }))
+                        .then(function (response) {
+                            console.log(response);
+                            if (response) {
                                 Swal.fire({
                                     icon: "success",
                                     title: `Payment Success`,
-                                    text: `Transaction Complete!`,
+                                    text: `Transaction Complete! Your transaction id is ${response.transaction_id} `,
                                     showConfirmButton: true,
                                 });
-                            }).catch(function (exception) {
-                                alert(exception);
+                                return;
+                            }
+                            Swal.fire({
+                                icon: "success",
+                                title: `Payment Success`,
+                                text: `Transaction Complete!`,
+                                showConfirmButton: true,
                             });
-                    })
+                        }).catch(function (exception) {
+                            console.error(exception)
+                            alert(exception);
+                        });
+                    });
                 });
             }
         </script>
