@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use MoneyCurrency;
+use Illuminate\Support\Facades\Cache;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class PaypalGatewayController extends Controller
@@ -14,7 +15,13 @@ class PaypalGatewayController extends Controller
     {
         $this->provider = new PayPalClient;
         $this->provider->setApiCredentials(config('paypal'));
-        $token = $this->provider->getAccessToken();
+        $token = Cache::get('paypal-token-'.config('paypal.mode', 'live'));
+
+        if (empty($token)) {
+            $token = $this->provider->getAccessToken();
+            Cache::put('paypal-token', $token, ($token['expires_in'] - 10));
+        }
+
         $this->provider->setAccessToken($token);
     }
 
