@@ -15,11 +15,11 @@ class productController extends Controller
         Xendit::setApiKey(env("API_KEY"));
 
         $priceIDR = 100000;
-        $priceUSD = MoneyCurrency::IDRToUSD($priceIDR);
+        $priceUSD = 12;
         $priceVEX = "0.0001 VEX";
 
         $data = [
-            "price" => (session()->get("localization_currency") == "USD") ? $priceUSD : 
+            "price" => (session()->get("localization_currency") == "USD") ? $priceUSD :
                         ((session()->get("localization_currency") == "VEX") ? $priceVEX : number_format($priceIDR))
                 ,
         ];

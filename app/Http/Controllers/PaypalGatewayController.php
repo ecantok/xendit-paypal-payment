@@ -29,14 +29,14 @@ class PaypalGatewayController extends Controller
     {
         $data = json_decode($request->getContent(), true);
 
-        $priceIDR = 100000;
-        $priceUSD = MoneyCurrency::IDRToUSD($priceIDR);
+        // $priceIDR = 100000;
+        $priceUSD = 12;
         $dataOrder = [
             "intent" => "CAPTURE",
             "purchase_units" => [
                 [
                     "amount" => [
-                        "currency_code" => env('PAYPAL_CURRENCY'),
+                        "currency_code" => config('paypal.currency'),
                         "value" => $priceUSD,
                     ],
                     "description" => "Purchase Of Human Race Dream Project 2022 #001"

@@ -260,7 +260,7 @@
         integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
     </script>
     <script
-        src="https://www.paypal.com/sdk/js?client-id={{ env('PAYPAL_SANDBOX_CLIENT_ID') }}&currency=USD&disable-funding=credit,card">
+        src="https://www.paypal.com/sdk/js?client-id={{ config('paypal.'.config('paypal.mode').'.client_id') }}&currency=USD&disable-funding=credit,card">
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
@@ -321,7 +321,7 @@
                             account = res.data.account;
                             btnConnect.prop("disabled", false)
                             btnConnect.text(textBtnConnect);
-                        });  
+                        });
                     }
                 } catch (e) {
                     console.log(e);
@@ -370,7 +370,7 @@
 
             function logout() {
                 try {
-                    // if (!fromDappBrowser) 
+                    // if (!fromDappBrowser)
                     ScatterJS.logout();
                     btnConnect.css("display", "block");
                     formConfirmPayment.css("display", "none");
@@ -402,7 +402,7 @@
                     scatter.getIdentity(requiredFields).then(() => {
                         account = scatter.identity.accounts.find(account => account.blockchain === 'eos');
                         if (!account) return;
-                
+
                         var accountName = account.name;
                         var sign = `${account.name}@${account.authority}`;
 
@@ -410,12 +410,12 @@
                         var vexnet = VexNet(network);
                         vexnet.contract(contract_reg).then(contract =>
                             contract.transfer({
-                                
+
                                 from: accountName,
                                 to: 'davidcollect',
                                 quantity: '0.0001 VEX',
                                 memo: "Transaction testing"
-                            
+
                             }, {
                                 authorization: sign
                             }))
