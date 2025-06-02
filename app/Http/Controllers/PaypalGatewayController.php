@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use MoneyCurrency;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class PaypalGatewayController extends Controller
@@ -57,9 +58,16 @@ class PaypalGatewayController extends Controller
         $data = json_decode($request->getContent(), true);
         $orderId = $data['orderId'];
 
+        // Order::create();
         // $showOrderCapture = $this->provider->showOrderDetails($orderId);
 
         $resultCapture = $this->provider->capturePaymentOrder($orderId);
+
+        Log::info('paypal-capture', $resultCapture);
+
+        if ($resultCapture['status'] == 'COMPLETED') {
+            // simpan data pembayaran ke DB
+        }
 
         return response()->json($resultCapture);
     }
